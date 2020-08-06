@@ -18,11 +18,6 @@ export default new Router({
 			component: () => import('@/views/About.vue')
 		},
 		{
-			path: '/account/profile',
-			name: 'Profile',
-			component: () => import('@/views/account/Profile.vue')
-		},
-		{
 			path: '/account/login',
 			name: 'Login',
 			component: () => import('@/views/account/Login.vue')
@@ -31,6 +26,16 @@ export default new Router({
 			path: '/account/register',
 			name: 'Register',
 			component: () => import('@/views/account/Register.vue')
+		},
+		{
+			path: '/account/profile',
+			name: 'Profile',
+			component: () => import('@/views/account/profile/Profile.vue')
+		},
+		{
+			path: '/account/profile/posts',
+			name: 'ProfilePosts',
+			component: () => import('@/views/account/profile/Posts.vue')
 		},
 		{
 			path: '/posts',

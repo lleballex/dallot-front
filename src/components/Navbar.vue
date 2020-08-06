@@ -136,6 +136,7 @@
 	border: 3px solid #2a2a2a;
 	background: #fff;
 	text-transform: none;
+	z-index: 1;
 	transition: .4s;
 }
 

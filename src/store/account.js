@@ -129,6 +129,30 @@ export default {
 					message: message
 				}
 			})
+		},
+
+		async getUserOverview(context, { id }) {
+			return axios.get(`api/account/users/${id}/overview/`)
+				.then(response => ({
+					success: true,
+					posts: response.data.posts
+				}))
+				.catch(error => ({
+					success: false,
+					message: error.message
+				}))
+		},
+
+		async getUserPosts(context, { id }) {
+			return axios.get(`api/account/users/${id}/posts/`)
+				.then(response => ({
+					success: true,
+					posts: response.data
+				}))
+				.catch(error => ({
+					success: false,
+					message: error.message
+				}))
 		}
 	},
 	getters: {

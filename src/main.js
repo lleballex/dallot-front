@@ -41,7 +41,7 @@ axios.interceptors.response.use((response) => ({
 
 	try {
 		var data = {
-			message: 'Ой-ой! Что-то пошло не так',
+			message: 'Ой-ой! При загрузке данных что-то пошло не так',
 			detail: error.response.data.detail,
 			status: error.response.status,
 			data: error.response.data

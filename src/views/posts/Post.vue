@@ -22,9 +22,9 @@
 				</div>
 				<div class="post__body" v-html="post.content"></div>
 			</div>
-			<div v-if="comments" class="content__block">
+			<!--<div v-if="comments" class="content__block">
 				{{comments}}
-			</div>
+			</div>-->
 		</div>
 		<Loading v-else />
 	</div>

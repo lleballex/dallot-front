@@ -31,6 +31,7 @@
 	line-height: 25px;
 	border-radius: 3px;
 	display: flex;
+	z-index: 2;
 	justify-content: space-between;
 }
 

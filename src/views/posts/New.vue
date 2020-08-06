@@ -2,7 +2,7 @@
 	<div v-if="this.$store.getters.isUserAuthenticated" class="update-post">
 		<div class="post content__block">
 			<div class="post__header">
-				<input ref="postTitleInput" class="update-post__title-input" type="text" placeholder="Заголовок поста">
+				<input ref="postTitleInput" class="update-post__title-input" type="text">
 			</div>
 			<TextEditor ref="textEditor" class="post__body"/>
 		</div>

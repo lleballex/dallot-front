@@ -2,7 +2,7 @@
 	<div class="navbar">
 		<div class="navbar__logo">
 			<router-link :to="{name: 'Home'}">
-				<img src="@/assets/logo.png" alt="Dallot">
+				<img src="@/assets/imgs/logo.png" alt="Dallot">
 			</router-link>
 		</div>
 		<div class="navbar__menu">

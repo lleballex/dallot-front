@@ -120,6 +120,18 @@ export default {
 				.catch(() => ({
 					success: false,
 				}))
+		},
+
+		getComments: (content, { post_id }) => {
+			return axios.get(`api/posts/${post_id}/comments/`)
+				.then(response => ({
+					success: true,
+					comments: response.data
+				}))
+				.catch(error => ({
+					success: false,
+					message: error.message
+				}))
 		}
 	},
 	getters: {

@@ -20,33 +20,33 @@ export default new Router({
 		{
 			path: '/account/profile',
 			name: 'Profile',
-			component: () => import('@/components/account/Profile.vue')
+			component: () => import('@/views/account/Profile.vue')
 		},
 		{
 			path: '/account/login',
 			name: 'Login',
-			component: () => import('@/components/account/Login.vue')
+			component: () => import('@/views/account/Login.vue')
 		},
 		{
 			path: '/account/register',
 			name: 'Register',
-			component: () => import('@/components/account/Register.vue')
+			component: () => import('@/views/account/Register.vue')
 		},
 		{
 			path: '/posts',
 			name: 'Posts',
-			component: () => import('@/components/posts/Posts.vue')
+			component: () => import('@/views/posts/Posts.vue')
 		},
 		{
 			path: '/posts/new',
 			name: 'NewPost',
-			component: () => import('@/components/posts/New.vue')
+			component: () => import('@/views/posts/New.vue')
 		},
 		{
 			path: '/posts/:id',
 			name: 'Post',
 			props: true,
-			component: () => import('@/components/posts/Post.vue')
+			component: () => import('@/views/posts/Post.vue')
 		}
 	]
 })

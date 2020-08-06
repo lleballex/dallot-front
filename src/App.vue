@@ -4,11 +4,11 @@
 		<div class="content-area">
 			<div class="content">
 				<router-view class="content__main-box" />
-				<div v-if="this.$store.state.showExtraContentBox" class="content__extra-box">
+				<!--<div v-if="this.$store.state.showExtraContentBox" class="content__extra-box">
 					<div class="content__block">
 						Extra content block
 					</div>
-				</div>
+				</div>-->
 			</div>
 		</div>
 		<Notifications/>

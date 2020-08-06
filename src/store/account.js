@@ -82,7 +82,7 @@ export default {
 		},
 
 		async userRegistration(context, { username, email, password }) {
-			return axios.post('api/account/create_user/', {
+			return axios.post('api/account/users/', {
 				username: username,
 				email: email,
 				password: password

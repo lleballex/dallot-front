@@ -22,6 +22,9 @@
 				</div>
 				<div class="post__body" v-html="post.content"></div>
 			</div>
+			<div v-if="comments" class="content__block">
+				{{comments}}
+			</div>
 		</div>
 		<Loading v-else />
 	</div>
@@ -34,7 +37,8 @@
 		name: 'Post',
 		props: ['id'],
 		data: () => ({
-			post: null
+			post: null,
+			comments: null
 		}),
 		components: {
 			Icons: () => import('@/components/posts/Icons.vue')
@@ -43,7 +47,6 @@
 			var result = await this.$store.dispatch('getPost', {
 				id: this.id
 			})
-
 			if(result.success) this.post = result.post
 			else {
 				this.$store.commit('showNotification', {
@@ -53,6 +56,17 @@
 			}
 			
 			this.$store.commit('showExtraContentBox')
+
+			result = await this.$store.dispatch('getComments', {
+				post_id: this.id
+			})
+			if(result.success) this.comments = result.comments
+			else {
+				this.$store.commit('showNotification', {
+					message: result.message,
+					type: 'error'
+				})
+			}
 		},
 		beforeDestroy() {
 			this.$store.commit('unshowExtraContentBox')

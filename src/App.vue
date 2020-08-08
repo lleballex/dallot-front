@@ -8,6 +8,9 @@
 					<div class="content__block">
 						Сайт находится в разработке.<br><br>Данные для связи: @lleballex - telegram
 					</div>
+					<div class="content__block" style="padding: 50px 30px; text-align: center;">
+						Место для вашей рекламы
+					</div>
 				</div>
 			</div>
 		</div>
@@ -21,22 +24,6 @@
 		components: {
 			Navbar: () => import('@/components/Navbar.vue'),
 			Notifications: () => import('@/components/Notifications.vue')
-		},
-		async created() {
-			var auth_token = localStorage.getItem('auth_token')
-			if(!auth_token) return
-				
-			var result = await this.$store.dispatch('checkAuthToken', {
-				token: auth_token
-			})
-
-			if(!result.success) {
-				localStorage.removeItem('auth_token')
-				this.$store.commit('showNotification', {
-					message: result.message,
-					type: 'error'
-				})
-			}
 		}
 	}
 </script>

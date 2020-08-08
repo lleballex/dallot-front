@@ -57,8 +57,33 @@ axios.interceptors.response.use((response) => ({
 	return Promise.reject(data)
 })
 
-new Vue({
-  router,
-  store,
-  render: h => h(App),
-}).$mount('#app')
+router.afterEach((to) => {
+	document.title = to.meta.title || 'Dallot'
+})
+
+var auth_token = localStorage.getItem('auth_token')
+if(auth_token) {
+	store.dispatch('checkAuthToken', {
+		token: auth_token
+	}).then(result => {
+		new Vue({
+			router,
+			store,
+			render: h => h(App),
+		}).$mount('#app')
+
+		if(!result.success) {
+			localStorage.removeItem('auth_token')
+			store.commit('showNotification', {
+				message: result.message,
+				type: 'error'
+			})
+		}
+	})
+} else {
+	new Vue({
+		router,
+		store,
+		render: h => h(App),
+	}).$mount('#app')
+}

@@ -10,6 +10,11 @@
 				Посты
 			</router-link>
 		</li>
+		<li>
+			<router-link :to="{name: 'ProfilePersonal'}" exact>
+				Данные
+			</router-link>
+		</li>
 	</ul>
 </template>
 

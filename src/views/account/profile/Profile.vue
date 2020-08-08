@@ -1,5 +1,5 @@
 <template>
-	<div class="profile">
+	<div v-if="this.$store.getters.isUserAuthenticated" class="profile">
 		<ProfileCard class="profile__card" />
 		<div class="profile__card content__block">
 			<ProfileMenu />
@@ -23,6 +23,7 @@
 			</div>
 		</div>
 	</div>
+	<Error v-else message="Для доступа к данной странице тебе нужно авторизоваться" />
 </template>
 
 <script>
@@ -32,12 +33,15 @@
 		name: 'Profile',
 		components: {
 			ProfileCard: () => import('@/components/account/ProfileCard.vue'),
-			ProfileMenu: () => import('@/components/account/ProfileMenu.vue')
+			ProfileMenu: () => import('@/components/account/ProfileMenu.vue'),
+			Error: () => import('@/components/Error.vue')
 		},
 		data: () => ({
 			posts: null
 		}),
 		async created() {
+			if(!this.$store.getters.isUserAuthenticated) return
+
 			var result = await this.$store.dispatch('getUserOverview', {
 				id: this.$store.getters.userId
 			})

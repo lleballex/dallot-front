@@ -9,6 +9,8 @@ export default {
 	},
 	mutations: {
 		setAuthToken: (state, token) => {
+			console.log('Mutation: setAuthToken')
+
 			state.authToken = token
 			state.isAuthenticated = true
 			localStorage.setItem('auth_token', token)
@@ -31,54 +33,56 @@ export default {
 	},
 	actions: {
 		async checkAuthToken({ commit }, { token }) {
+			console.log('Action: checkAuthToken')
+
 			return axios.post('api/account/token/get_user/', {
-					token: token
-				}).then(response => {
-					commit('setAuthToken', token)
-					commit('setUserInfo', response.data)
-					return {success: true}
-				}).catch(error => {
-					if(error.status == 400 &&
-						(error.detail == 'Token is invalid or expired' ||
-						error.detail == 'Token is invalid')
-					) {
-						return {
-							success: false,
-							message: 'Твой токен доступа истек. Перезайди в аккаунт'
-						}
-					}
+				token: token
+			}).then(response => {
+				commit('setAuthToken', token)
+				commit('setUserInfo', response.data)
+				return {success: true}
+			}).catch(error => {
+				if(error.status == 400 &&
+					(error.detail == 'Token is invalid or expired' ||
+					error.detail == 'Token is invalid')
+				) {
 					return {
 						success: false,
-						message: error.message
+						message: 'Твой токен доступа истек. Перезайди в аккаунт'
 					}
-				})
+				}
+				return {
+					success: false,
+					message: error.message
+				}
+			})
 		},
 
 		async getAuthToken({ commit }, { username, password}) {
 			return axios.post('api/account/token/get_auth_token/', {
-					username: username,
-					password: password
-				}).then(response => {
-					commit('setAuthToken', response.data.token)
-					commit('setUserInfo', response.data.user)
-					return {
-						success: true,
-						message: `Рад тебя видеть, ${response.data.user.username}`
-					}
-				}).catch(error => {
-					if(error.status == 400 &&
-						error.detail == 'Username or password are invalid'
-					) {
-						return {
-							success: false,
-							message: 'Кажется, ошибка в введенный данных'
-						}
-					}
+				username: username,
+				password: password
+			}).then(response => {
+				commit('setAuthToken', response.data.token)
+				commit('setUserInfo', response.data.user)
+				return {
+					success: true,
+					message: `Рад тебя видеть, ${response.data.user.username}`
+				}
+			}).catch(error => {
+				if(error.status == 400 &&
+					error.detail == 'Username or password are invalid'
+				) {
 					return {
 						success: false,
-						message: error.message
+						message: 'Кажется, ошибка в введенный данных'
 					}
-				})
+				}
+				return {
+					success: false,
+					message: error.message
+				}
+			})
 		},
 
 		async userRegistration(context, { username, email, password }) {
@@ -143,6 +147,20 @@ export default {
 				}))
 		},
 
+		async getUser(context, { id }) {
+			console.log('Action: getUser')
+
+			return axios.get(`api/account/users/${id}/`)
+				.then(response => ({
+					success: true,
+					user: response.data
+				}))
+				.catch(error => ({
+					success: false,
+					message: error.message
+				}))
+		},
+
 		async getUserPosts(context, { id }) {
 			return axios.get(`api/account/users/${id}/posts/`)
 				.then(response => ({
@@ -153,6 +171,41 @@ export default {
 					success: false,
 					message: error.message
 				}))
+		},
+
+		async updateUser(context, { id, username, email, name }) {
+			return axios.put(`api/account/users/${id}/`, {
+				username: username,
+				email: email,
+				first_name: name
+			}).then((response) => ({
+				success: true,
+				message: 'Готово! Твой профиль успешно обновлен',
+				user: response.data
+			})).catch(error => {
+				if(error.status != 400) return {
+					success: false,
+					message: error.message
+				}
+
+				switch(error.data[Object.keys(error.data)[0]][0]) {
+					case 'Enter a valid email address.':
+						var message = 'Лучше ввести корректный email'
+						break
+					case 'user with this username already exists.':
+						message = 'Я уже знаю пользователя с таким логином'
+						break
+					case 'user with this email already exists.':
+						message = 'Это точно твой email? У нас уже есть один с такой почтой'
+						break
+					default:
+						message = error.data[Object.keys(error.data)[0]][0]
+				}
+				return {
+					success: false,
+					message: message
+				}
+			})
 		}
 	},
 	getters: {

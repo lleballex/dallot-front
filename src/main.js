@@ -14,7 +14,7 @@ import { faCommentAlt as fasCommentAlt } from '@fortawesome/free-solid-svg-icons
 import { faCommentAlt as farCommentAlt } from '@fortawesome/free-regular-svg-icons'
 import { faTimes, faChevronUp, faChevronDown, faBug, faCheck, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faHeading, faCode, faListUl } from '@fortawesome/free-solid-svg-icons'
-import { faDotCircle } from '@fortawesome/free-regular-svg-icons'
+import { faDotCircle, faImage } from '@fortawesome/free-regular-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import '@/assets/css/index.css'
 
@@ -23,7 +23,7 @@ library.add(fasBookmark, farBookmark)
 library.add(fasCommentAlt, farCommentAlt)
 library.add(faTimes, faChevronUp, faChevronDown, faBug, faCheck, faPlus)
 library.add(faHeading, faCode, faListUl)
-library.add(faDotCircle, faTrash)
+library.add(faDotCircle, faImage, faTrash)
 
 Vue.component('icon', FontAwesomeIcon)
 

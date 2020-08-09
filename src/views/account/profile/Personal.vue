@@ -22,6 +22,12 @@
 					</div>
 					<input v-model="name" type="text" class="profile__field">
 				</div>
+				<div class="profile__field-block">
+					<div class="profile__field-label">
+						О себе
+					</div>
+					<textarea v-model="about" class="profile__field"></textarea>
+				</div>
 				<input class="profile__submit-btn" type="submit" value="Сохранить">
 			</form>
 		</div>
@@ -37,7 +43,8 @@
 		data: () => ({
 			username: '',
 			email: '',
-			name: ''
+			name: '',
+			about: '',
 		}),
 		components: {
 			ProfileCard: () => import('@/components/account/ProfileCard.vue'),
@@ -47,19 +54,10 @@
 		async created() {
 			if(!this.$store.getters.isUserAuthenticated) return
 
-			var result = await this.$store.dispatch('getUser', {
-				id: this.$store.getters.userId
-			})
-			if(result.success) {
-				this.username = result.user.username
-				this.email = result.user.email
-				this.name = result.user.first_name
-			} else {
-				this.$store.commit('showNotification', {
-					message: result.message,
-					type: 'error'
-				})
-			}
+			this.username = this.$store.getters.username
+			this.email = this.$store.getters.userEmail
+			this.name = this.$store.getters.userName
+			this.about = this.$store.getters.userAbout
 		},
 		methods: {
 			updateUser() {
@@ -67,7 +65,8 @@
 					id: this.$store.getters.userId,
 					username: this.username,
 					email: this.email,
-					name: this.name
+					name: this.name,
+					about: this.about
 				}).then(result => {
 					if(result.success)
 						this.$store.commit('setUserInfo', result.user)
@@ -112,6 +111,10 @@
 		font-family: 'Montserrat', sans-serif;
 		font-size: 15px;
 		transition: .2s;
+	}
+
+	textarea.profile__field {
+		height: 50px;
 	}
 
 	.profile__field:focus {

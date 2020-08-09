@@ -4,13 +4,15 @@ export default {
 	state: {
 		isAuthenticated: false,
 		authToken: null,
+		id: null,
 		username: null,
-		userId: null
+		email: null,
+		name: null,
+		about: null,
+		image: null
 	},
 	mutations: {
 		setAuthToken: (state, token) => {
-			console.log('Mutation: setAuthToken')
-
 			state.authToken = token
 			state.isAuthenticated = true
 			localStorage.setItem('auth_token', token)
@@ -19,22 +21,28 @@ export default {
 
 		setUserInfo: (state, payload) => {
 			state.username = payload.username
-			state.userId = payload.id
+			state.id = payload.id
+			state.email = payload.email
+			state.name = payload.name
+			state.about = payload.about
+			
+			if(payload.image && payload.image.indexOf('http') < 0)
+				state.image = `http://localhost:8000${payload.image}`
+			else if(payload.image)
+				state.image = payload.image
 		},
 
 		logout: (state) => {
 			state.authToken = null
 			state.isAuthenticated = false
 			state.username = null
-			state.userId = null
+			state.id = null
 			localStorage.removeItem('auth_token')
 			delete axios.defaults.headers.common['auth-token']
 		}
 	},
 	actions: {
 		async checkAuthToken({ commit }, { token }) {
-			console.log('Action: checkAuthToken')
-
 			return axios.post('api/account/token/get_user/', {
 				token: token
 			}).then(response => {
@@ -147,20 +155,6 @@ export default {
 				}))
 		},
 
-		async getUser(context, { id }) {
-			console.log('Action: getUser')
-
-			return axios.get(`api/account/users/${id}/`)
-				.then(response => ({
-					success: true,
-					user: response.data
-				}))
-				.catch(error => ({
-					success: false,
-					message: error.message
-				}))
-		},
-
 		async getUserPosts(context, { id }) {
 			return axios.get(`api/account/users/${id}/posts/`)
 				.then(response => ({
@@ -173,11 +167,13 @@ export default {
 				}))
 		},
 
-		async updateUser(context, { id, username, email, name }) {
+		async updateUser(context, { id, username, email, name, about, image }) {
 			return axios.put(`api/account/users/${id}/`, {
 				username: username,
 				email: email,
-				first_name: name
+				name: name,
+				about: about,
+				image: image
 			}).then((response) => ({
 				success: true,
 				message: 'Готово! Твой профиль успешно обновлен',
@@ -209,9 +205,13 @@ export default {
 		}
 	},
 	getters: {
-		authToken: (state) => (state.authToken),
-		isUserAuthenticated: (state) => (state.isAuthenticated),
-		username: (state) => (state.username),
-		userId: (state) => (state.userId)
+		authToken: state => (state.authToken),
+		isUserAuthenticated: state => (state.isAuthenticated),
+		username: state => (state.username),
+		userId: state => (state.id),
+		userEmail: state => (state.email),
+		userName: state => (state.name),
+		userAbout: state => (state.about),
+		userImage: state => (state.image)
 	}
 }

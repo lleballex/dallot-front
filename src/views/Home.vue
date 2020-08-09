@@ -1,15 +1,9 @@
 <template>
-	<div>
-		<h1>Home page</h1>
-		<Loading />
-	</div>
+	<h1>Home page</h1>
 </template>
 
 <script>
 	export default {
-		name: 'Home',
-		components: {
-			Loading: () => import('@/components/Loading.vue')
-		}
+		name: 'Home'
 	}
 </script>

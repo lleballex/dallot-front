@@ -1,8 +1,8 @@
 <template>
-	<div v-if="this.$store.getters.isUserAuthenticated" class="profile">
-		<ProfileCard class="profile__card" />
+	<div v-if="$store.getters.isUserAuthenticated && access" class="profile">
+		<ProfileCard ref="profileCard" :username="$store.getters.username" class="profile__card" />
 		<div class="profile__card content__block">
-			<ProfileMenu />
+			<ProfileMenu :username="$store.getters.username" />
 			<form @submit.prevent="updateUser" class="profile__fields profile__overview profile__overview-block">
 				<div class="profile__field-block">
 					<div class="profile__field-label">
@@ -32,7 +32,7 @@
 			</form>
 		</div>
 	</div>
-	<Error v-else message="Для доступа к этой странице тебе нужно авторизоваться" />
+	<Error v-else message="Эта страница предназначена для другого пользователя" />
 </template>
 
 <script>
@@ -40,21 +40,29 @@
 
 	export default {
 		name: 'ProfilePosts',
-		data: () => ({
-			username: '',
-			email: '',
-			name: '',
-			about: '',
-		}),
-		components: {
-			ProfileCard: () => import('@/components/account/ProfileCard.vue'),
-			ProfileMenu: () => import('@/components/account/ProfileMenu.vue'),
-			Error: () => import('@/components/Error.vue')
+		data() {
+			return {
+				username: this.$route.params.username,
+				email: '',
+				name: '',
+				about: '',
+				access: true
+			}
 		},
-		async created() {
-			if(!this.$store.getters.isUserAuthenticated) return
+		components: {
+			Error: () => import('@/components/Error.vue'),
+			ProfileCard: () => import('@/components/account/ProfileCard.vue'),
+			ProfileMenu: () => import('@/components/account/ProfileMenu.vue')
+		},
+		created() {
+			if (
+				!this.$store.getters.isUserAuthenticated ||
+				this.$store.getters.username != this.username
+			) {
+				this.access = false
+				return
+			}
 
-			this.username = this.$store.getters.username
 			this.email = this.$store.getters.userEmail
 			this.name = this.$store.getters.userName
 			this.about = this.$store.getters.userAbout
@@ -68,8 +76,16 @@
 					name: this.name,
 					about: this.about
 				}).then(result => {
-					if(result.success)
+					if(result.success) {
 						this.$store.commit('setUserInfo', result.user)
+						this.$refs.profileCard.updateUserData()
+						if(this.username != this.$route.params.username) {
+							this.$router.push({
+								name: 'ProfilePersonal',
+								params: {username: this.username}
+							})
+						}
+					}
 					
 					this.$store.commit('showNotification', {
 						message: result.message,

@@ -20,7 +20,7 @@
 					</ul>
 				</li>
 				<li v-if="this.$store.getters.isUserAuthenticated">
-					<router-link :to="{name: 'Profile'}" class="navbar__main-link">
+					<router-link :to="{name: 'Profile', params: {username: $store.getters.username}}" class="navbar__main-link">
 						{{this.$store.getters.username}}
 					</router-link>
 					<ul class="navbar__extra-menu">

@@ -21,26 +21,28 @@ export default new Router({
 			path: '/account/login',
 			name: 'Login',
 			component: () => import('@/views/account/Login.vue'),
-			meta: {title: 'Авторизация \\ Dallot'}
+			meta: {title: 'Авторизация'}
 		},
 		{
 			path: '/account/register',
 			name: 'Register',
 			component: () => import('@/views/account/Register.vue'),
-			meta: {title: 'Регистрация \\ Dallot'}
+			meta: {title: 'Регистрация'}
 		},
 		{
-			path: '/account/profile',
+			path: '/users/:username',
 			name: 'Profile',
-			component: () => import('@/views/account/profile/Profile.vue')
+			props: true,
+			component: () => import('@/views/account/profile/Overview.vue')
 		},
 		{
-			path: '/account/profile/posts',
+			path: '/users/:username/posts',
 			name: 'ProfilePosts',
+			props: true,
 			component: () => import('@/views/account/profile/Posts.vue')
 		},
 		{
-			path: '/account/profile/personal',
+			path: '/users/:username/personal',
 			name: 'ProfilePersonal',
 			component: () => import('@/views/account/profile/Personal.vue')
 		},
@@ -48,13 +50,13 @@ export default new Router({
 			path: '/posts',
 			name: 'Posts',
 			component: () => import('@/views/posts/Posts.vue'),
-			meta: {title: 'Последние посты \\ Dallot'}
+			meta: {title: 'Последние посты'}
 		},
 		{
 			path: '/posts/new',
 			name: 'NewPost',
 			component: () => import('@/views/posts/New.vue'),
-			meta: {title: 'Новый пост \\ Dallot'}
+			meta: {title: 'Новый пост'}
 		},
 		{
 			path: '/posts/:id',

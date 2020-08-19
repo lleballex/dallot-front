@@ -2,10 +2,10 @@
 	<div class="content__block">
 		<div class="profile__img-container">
 			<div class="profile__img-preview">
-				<img v-if="$store.getters.userImage" :src="$store.getters.userImage">
-				<img v-else src="@/assets/imgs/user.png">
+				<img v-if="userImage" :src="userImage">
+				<img v-else src="@/assets/imgs/user_mask.svg">
 			</div>
-			<button @click="$refs.imageChooser.click()" class="profile__change-img-btn">
+			<button v-if="userIsOwner" @click="$refs.imageChooser.click()" class="profile__change-img-btn">
 				<icon :icon="['far', 'image']" />
 			</button>
 			<input
@@ -17,12 +17,12 @@
 			>
 		</div>
 		<div class="profile__username">
-			{{this.$store.getters.username}}
+			{{username}}
 		</div>
-		<div v-if="$store.getters.userAbout" class="profile__about-user">
-			{{this.$store.getters.userAbout}}
+		<div v-if="userAbout" class="profile__about-user">
+			{{userAbout}}
 		</div>
-		<div v-show="showImageCropper" class="profile__cropper-container">
+		<div v-if="userIsOwner" v-show="showImageCropper" class="profile__cropper-container">
 			<vue-cropper
 				ref="imageCropper"
 				:src="imageSrc"
@@ -47,14 +47,53 @@
 
 	export default {
 		name: 'ProfileCard',
+		props: {
+			username: String
+		},
 		data: () => ({
+			userAbout: '',
+			userImage: '',
 			imageSrc: '',
-			showImageCropper: false
+			showImageCropper: false,
+			userIsOwner: false
 		}),
 		components: {
 			VueCropper: () => import('vue-cropperjs')
 		},
+		created() {
+			if(this.username == this.$store.getters.username) {
+				this.userAbout = this.$store.getters.userAbout
+				this.userImage = this.$store.getters.userImage
+				this.userIsOwner = true
+				return
+			}
+
+			var loadedUser = this.$store.getters.loadedUser
+
+			if(loadedUser && loadedUser.username == this.username) {
+				this.userImage = loadedUser.image
+				this.userAbout = loadedUser.about
+			} else {
+				this.$store.dispatch('getUser', {
+					username: this.username
+				}).then(result => {
+					if(result.success) {
+						this.userAbout = result.user.about
+						this.userImage = result.user.image
+						this.$store.commit('setLoadedUser', {
+							username: this.username,
+							image: this.userImage,
+							about: this.userAbout
+						})
+					}
+				})
+			}
+		},
 		methods: {
+			updateUserData() {
+				this.userAbout = this.$store.getters.userAbout
+			},
+
 			setImage(event) {
 				var file = event.target.files[0]
 
@@ -89,12 +128,10 @@
 
 			async saveImage() {
 				this.$store.dispatch('updateUser', {
-					id: this.$store.getters.userId,
 					username: this.$store.getters.username,
 					email: this.$store.getters.userEmail,
 					image: await this.$refs.imageCropper.getCroppedCanvas().toDataURL()
 				}).then(result => {
-					console.log(result)
 					this.hideCropper()
 					this.$store.commit('showNotification', {
 						message: result.success ? 'Ура! Фото профиля успешно обновлено' : result.message,

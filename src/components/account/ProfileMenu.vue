@@ -10,7 +10,7 @@
 				Посты
 			</router-link>
 		</li>
-		<li>
+		<li v-if="showPersonal">
 			<router-link :to="{name: 'ProfilePersonal'}" exact>
 				Данные
 			</router-link>
@@ -20,7 +20,17 @@
 
 <script>
 	export default {
-		name: 'ProfileMenu'
+		name: 'ProfileMenu',
+		props: {
+			username: String
+		},
+		data: () => ({
+			showPersonal: false
+		}),
+		created() {
+			if(this.$store.getters.username == this.username)
+				this.showPersonal = true
+		}
 	}
 </script>
 

@@ -9,7 +9,8 @@ export default {
 		email: null,
 		name: null,
 		about: null,
-		image: null
+		image: null,
+		loadedUser: null
 	},
 	mutations: {
 		setAuthToken: (state, token) => {
@@ -37,8 +38,20 @@ export default {
 			state.isAuthenticated = false
 			state.username = null
 			state.id = null
+			state.email = null
+			state.name = null
+			state.about = null
+			state.image = null
 			localStorage.removeItem('auth_token')
 			delete axios.defaults.headers.common['auth-token']
+		},
+
+		setLoadedUser: (state, { username, image, about }) => {
+			state.loadedUser = {
+				username: username,
+				image: image,
+				about: about
+			}
 		}
 	},
 	actions: {
@@ -143,38 +156,71 @@ export default {
 			})
 		},
 
-		async getUserOverview(context, { id }) {
-			return axios.get(`api/account/users/${id}/overview/`)
+		async getUser(context, { username }) {
+			return axios.get(`api/account/users/${username}/`)
+				.then(response => ({
+					success: true,
+					user: response.data
+				}))
+				.catch(() => ({
+					success: false
+				}))
+		},
+
+		async getUserOverview(context, { username }) {
+			return axios.get(`api/account/users/${username}/overview/`)
 				.then(response => ({
 					success: true,
 					posts: response.data.posts
 				}))
-				.catch(error => ({
-					success: false,
-					message: error.message
-				}))
+				.catch(error => {
+					if(error.status == 404 && error.detail == 'Object not found') {
+						return {
+							success: false,
+							message: 'Прости, но я не смог найти такого пользователя'
+						}
+					}
+					return {
+						success: false,
+						message: error.message
+					}
+				})
 		},
 
-		async getUserPosts(context, { id }) {
-			return axios.get(`api/account/users/${id}/posts/`)
+		async getUserPosts(context, { username }) {
+			return axios.get(`api/account/users/${username}/posts/`)
 				.then(response => ({
 					success: true,
 					posts: response.data
 				}))
-				.catch(error => ({
-					success: false,
-					message: error.message
-				}))
+				.catch(error => {
+					if(error.status == 404 && error.detail == 'Object not found') {
+						return {
+							success: false,
+							message: 'Прости, но я не смог найти такого пользователя'
+						}
+					}
+					return {
+						success: false,
+						message: error.message
+					}
+				})
 		},
 
-		async updateUser(context, { id, username, email, name, about, image }) {
-			return axios.put(`api/account/users/${id}/`, {
+		async updateUser(context, { id=null, username, email, name, about, image }) {
+			var data = {
 				username: username,
 				email: email,
 				name: name,
 				about: about,
 				image: image
-			}).then((response) => ({
+			}
+			if(id) {
+				data['id'] = id
+				var url = `api/account/users/${id}/`
+			} else url = `api/account/users/${username}/`
+
+			return axios.put(url, data).then((response) => ({
 				success: true,
 				message: 'Готово! Твой профиль успешно обновлен',
 				user: response.data
@@ -212,6 +258,7 @@ export default {
 		userEmail: state => (state.email),
 		userName: state => (state.name),
 		userAbout: state => (state.about),
-		userImage: state => (state.image)
+		userImage: state => (state.image),
+		loadedUser: state => (state.loadedUser)
 	}
 }

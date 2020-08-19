@@ -1,8 +1,8 @@
 <template>
-	<div v-if="this.$store.getters.isUserAuthenticated" class="profile">
-		<ProfileCard class="profile__card" />
+	<div class="profile">
+		<ProfileCard :username="username" class="profile__card" />
 		<div class="profile__card content__block">
-			<ProfileMenu />
+			<ProfileMenu :username="username" />
 			<div class="profile__overview">
 				<div class="profile__overview-block">
 					<div class="profile__overview-items">
@@ -20,7 +20,6 @@
 			</div>
 		</div>
 	</div>
-	<Error v-else message="Для доступа к этой странице тебе нужно авторизоваться" />
 </template>
 
 <script>
@@ -28,28 +27,22 @@
 
 	export default {
 		name: 'ProfilePosts',
+		props: ['username'],
 		data: () => ({
-			posts: null
+			posts: null,
+			errorMessage: ''
 		}),
 		components: {
 			ProfileCard: () => import('@/components/account/ProfileCard.vue'),
-			ProfileMenu: () => import('@/components/account/ProfileMenu.vue'),
-			Error: () => import('@/components/Error.vue')
+			ProfileMenu: () => import('@/components/account/ProfileMenu.vue')
 		},
-		async created() {
-			if(!this.$store.getters.isUserAuthenticated) return
-
-			var result = await this.$store.dispatch('getUserPosts', {
-				id: this.$store.getters.userId
+		created() {
+			this.$store.dispatch('getUserPosts', {
+				username: this.username
+			}).then(result => {
+				if(result.success) this.posts = result.posts
+				else this.errorMessage = result.message
 			})
-			if(result.success) {
-				this.posts = result.posts
-			} else {
-				this.$store.commit('showNotification', {
-					message: result.message,
-					type: 'error'
-				})
-			}
 		}
 	}
 </script>

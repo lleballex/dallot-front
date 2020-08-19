@@ -37,7 +37,7 @@ axios.interceptors.response.use((response) => ({
 	data: response.data,
 	status: response.status
 }), function(error) {
-	console.log('ERROR: ', error)
+	console.log('ERROR: ', error.response ? error.response : error)
 
 	try {
 		var data = {
@@ -58,7 +58,7 @@ axios.interceptors.response.use((response) => ({
 })
 
 router.afterEach((to) => {
-	document.title = to.meta.title || 'Dallot'
+	document.title = to.meta.title ? `${to.meta.title} / Dallot` : 'Dallot'
 })
 
 var auth_token = localStorage.getItem('auth_token')

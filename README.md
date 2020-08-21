@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://dallot.ru"><img src="https://dallot.ru/img/logo.28605f0b.png" height="180px" title="Dallot" alt="Dallot"></a>
+  <a href="https://dallot.ru"><img src="https://dallot.ru/img/logo.28605f0b.png" height="150px" title="Dallot" alt="Dallot"></a>
 </p>
 
 > This is the frontend part of the project, and most of the following will only apply to the frontend. Backend part can be viewed [here](https://github.com/lleballex/dallot-back)

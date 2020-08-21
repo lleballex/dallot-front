@@ -24,7 +24,7 @@
 git clone https://github.com/lleballex/dallot-front.git
 ```
 
-#### Project setup:
+#### Project setup
 ```
 cd dallot-front
 npm install
@@ -35,41 +35,18 @@ npm install
 npm run serve
 ```
 
+##### Compiling for production
+```
+npm run build
+```
+
+<!--##### Lints and fixes files
+```
+npm run lint
+```-->
+
 <h2 align="center">Contacts:</h2>
 
 - [Telegram](https://t.me/lleballex)
 - [VK](https://vk.com/lleballex)
 - [Dallot](https://dallot.ru)
-
-
-
-
-
-
-
-
-
-
-
-<!--## Project setup
- ```
- npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).-->

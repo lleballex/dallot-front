@@ -35,7 +35,7 @@ npm install
 npm run serve
 ```
 
-##### Compiling for production
+###### Compiling for production
 ```
 npm run build
 ```

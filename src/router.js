@@ -15,7 +15,8 @@ export default new Router({
 		{
 			path: '/about',
 			name: 'About',
-			component: () => import('@/views/About.vue')
+			component: () => import('@/views/About.vue'),
+			meta: {title: 'О проекте'}
 		},
 		{
 			path: '/account/login',
@@ -33,18 +34,21 @@ export default new Router({
 			path: '/users/:username',
 			name: 'Profile',
 			props: true,
-			component: () => import('@/views/account/profile/Overview.vue')
+			component: () => import('@/views/account/profile/Overview.vue'),
+			meta: {title: 'Просмотр профиля пользователя'}
 		},
 		{
 			path: '/users/:username/posts',
 			name: 'ProfilePosts',
 			props: true,
-			component: () => import('@/views/account/profile/Posts.vue')
+			component: () => import('@/views/account/profile/Posts.vue'),
+			meta: {title: 'Просмотр постов пользователя'}
 		},
 		{
 			path: '/users/:username/personal',
 			name: 'ProfilePersonal',
-			component: () => import('@/views/account/profile/Personal.vue')
+			component: () => import('@/views/account/profile/Personal.vue'),
+			meta: {title: 'Данные о себе'}
 		},
 		{
 			path: '/posts',
@@ -62,7 +66,8 @@ export default new Router({
 			path: '/posts/:id',
 			name: 'Post',
 			props: true,
-			component: () => import('@/views/posts/Post.vue')
+			component: () => import('@/views/posts/Post.vue'),
+			meta: {title: 'Пост'}
 		}
 	]
 })

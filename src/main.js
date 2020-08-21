@@ -61,6 +61,11 @@ router.afterEach((to) => {
 	document.title = to.meta.title ? `${to.meta.title} / Dallot` : 'Dallot'
 })
 
+router.beforeEach((to, from, next) => {
+	if(to.path[to.path.length - 1] == '/') next()
+	else next({path: `${to.path}/`})
+})
+
 var auth_token = localStorage.getItem('auth_token')
 if(auth_token) {
 	store.dispatch('checkAuthToken', {

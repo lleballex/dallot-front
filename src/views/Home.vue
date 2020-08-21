@@ -5,8 +5,8 @@
 <script>
 	export default {
 		name: 'Home',
-		created() {
+		/*created() {
 			this.$router.push({name: 'Posts'})
-		}
+		}*/
 	}
 </script>

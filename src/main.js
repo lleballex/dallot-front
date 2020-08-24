@@ -6,24 +6,18 @@ import axios from 'axios'
 import Loading from '@/components/Loading.vue'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faEye as fasEye } from '@fortawesome/free-solid-svg-icons'
-import { faEye as farEye } from '@fortawesome/free-regular-svg-icons'
-import { faBookmark as fasBookmark } from '@fortawesome/free-solid-svg-icons'
-import { faBookmark as farBookmark } from '@fortawesome/free-regular-svg-icons'
-import { faCommentAlt as fasCommentAlt } from '@fortawesome/free-solid-svg-icons'
-import { faCommentAlt as farCommentAlt } from '@fortawesome/free-regular-svg-icons'
-import { faTimes, faChevronUp, faChevronDown, faBug, faCheck, faPlus } from '@fortawesome/free-solid-svg-icons'
-import { faHeading, faCode, faListUl } from '@fortawesome/free-solid-svg-icons'
-import { faDotCircle, faImage } from '@fortawesome/free-regular-svg-icons'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faBug, faCheck, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faHeading, faCode, faListUl, faImage as fasImage } from '@fortawesome/free-solid-svg-icons'
+import { faChevronUp, faChevronDown, faBookmark as fasBookmark } from '@fortawesome/free-solid-svg-icons'
+import { faEye, faCommentAlt, faBookmark as farBookmark } from '@fortawesome/free-regular-svg-icons'
+import { faDotCircle, faImage as farImage } from '@fortawesome/free-regular-svg-icons'
 import '@/assets/css/index.css'
 
-library.add(fasEye, farEye)
-library.add(fasBookmark, farBookmark)
-library.add(fasCommentAlt, farCommentAlt)
-library.add(faTimes, faChevronUp, faChevronDown, faBug, faCheck, faPlus)
-library.add(faHeading, faCode, faListUl)
-library.add(faDotCircle, faImage, faTrash)
+library.add(faBug, faCheck, faTimes, faTrash)
+library.add(faPlus, faHeading, faCode, faListUl, fasImage)
+library.add(faChevronUp, faChevronDown, fasBookmark)
+library.add(faEye, faCommentAlt, farBookmark)
+library.add(faDotCircle, farImage)
 
 Vue.component('icon', FontAwesomeIcon)
 
@@ -63,7 +57,7 @@ router.afterEach((to) => {
 
 router.beforeEach((to, from, next) => {
 	if(to.path[to.path.length - 1] == '/') next()
-	else next({path: `${to.path}/`})
+	else next({path: `${to.path}/`, query: to.query})
 })
 
 var auth_token = localStorage.getItem('auth_token')

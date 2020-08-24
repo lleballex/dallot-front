@@ -167,16 +167,17 @@
 		top: 0;
 		left: 0;
 		opacity: 0;
-		background: #fff;
+		background: rgba(255, 255, 255, .5);
 		border: none;
 		border-radius: 50%;
 		font-size: 40px;
+		color: #333;
 		outline: none;
 		transition: .3s;
 	}
 
 	.profile__change-img-btn:hover {
-		opacity: .5;
+		opacity: 1;
 		cursor: pointer;
 	}
 

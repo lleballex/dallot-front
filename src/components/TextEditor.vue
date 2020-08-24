@@ -1,33 +1,44 @@
 <template>
-	<div class="text-editor">
-		<div 
+	<div @click.self="focusLastEditorBlock($event.target)" class="text-editor">
+		<div
+			ref="editArea"
 			@input.capture="updateEditorBlock($event.target)"
-			@keydown.capture.8="removeEditorBlock($event.target, true)"
-			@keydown.capture.46="removeEditorBlock($event.target, false, true)"
-			@focus.capture="showTools($event.target)"
-			@blur.capture="hideTools"
+			@keydown.capture.8="removeEditorBlock($event.target)"
+			@keydown.capture.46="removeEditorBlock($event.target, true)"
+			@focus.capture="showGlobalTools($event.target)"
+			@blur.capture="hideGlobalTools"
 			class="text-editor__edit-area"
 		>
-			<div class="text-editor__edit-block" onselectionchange="console.log('hello world')" contenteditable></div>
+			<div class="text-editor__edit-block" contenteditable></div>
 		</div>
-
-		<div ref="htmlTools" class="text-editor__tools text-editor__html-tools">
-			<icon icon="plus" class="text-editor__tools-icon" />
+		<div
+			v-show="globalTools"
+			ref="globalTools"
+			class="text-editor__tools text-editor__global-tools"
+		>
+			<icon icon="plus" class="text-editor__show-toolsbar-icon" />
 			<ul
-				@click.capture="htmlToolsAdd($event.target)"
-				@mouseover="htmlToolsbarHover = true"
-				@mouseout="htmlToolsbarHover = false"
-				ref="htmlToolsbar"
+				@click.capture="updateHtml($event.target)"
+				@mouseenter="canHideGlobalTools = false"
+				@mouseleave="unhoverGlobalTools"
 				class="text-editor__toolsbar"
 			>
 				<li>
-					<icon id="header-tools" icon="heading" class="text-editor__toolsbar-icon" title="Заголовок" />
+					<icon data-tool="header" icon="heading" class="text-editor__toolsbar-icon" title="Заголовок" />
 				</li>
 				<li>
-					<icon id="code-tools" icon="code" class="text-editor__toolsbar-icon" title="Код" />
+					<icon data-tool="code" icon="code" class="text-editor__toolsbar-icon" title="Код" />
 				</li>
 				<li>
-					<icon id="list-tools" icon="list-ul" class="text-editor__toolsbar-icon" title="Список" />
+					<icon data-tool="list" icon="list-ul" class="text-editor__toolsbar-icon" title="Список" />
+				</li>
+				<li>
+					<icon data-tool="image" icon="image" class="text-editor__toolsbar-icon" title="Картинка" data-hasfields />
+					<ul class="text-editor__toolsbar text-editor__toolsbar-fields">
+						<li>
+							<input class="text-editor__toolsbar-input" type="text" placeholder="Ссылка">
+						</li>
+					</ul>
 				</li>
 			</ul>
 		</div>
@@ -38,147 +49,129 @@
 	export default {
 		name: 'TextEditor',
 		data: () => ({
-			toolsView: false,
-			htmlToolsbarHover: false,
-			focusBlock: null
+			focusBlock: null,
+			globalTools: false,
+			canHideGlobalTools: true
 		}),
 		methods: {
-			updateEditorBlock(obj) {
-				if(obj.querySelector('div')) {
-					if(obj.classList.contains('text-editor__code')) return
+			focusLastEditorBlock(obj) {
+				if(!obj.classList.contains('text-editor')) return
 
-					var html = obj.querySelector('div').innerHTML.replace('<br>', '')
-					var divs = obj.querySelectorAll('div')
-					for(var i = 0; i < divs.length; i++)
-						divs[i].remove()
-					this.addEditorBlock(obj, html)
-				} else if(this.toolsView && obj.textContent) {
-					this.hideTools()
-				} else if(!this.toolsView && !obj.textContent) {
-					this.showTools(obj)
+				if(this.$refs.editArea.lastElementChild.textContent) {
+					this.addEditorBlock(this.$refs.editArea.lastElementChild)
+				} else {
+					this.$refs.editArea.lastElementChild.focus()
 				}
 			},
 
-			addEditorBlock(obj, html) {
-				if(!obj.textContent)
-					return obj
+			updateEditorBlock(obj) {
+				if(obj.innerText.indexOf('\n') >= 0) {
+					var text = obj.innerText.split('\n')
+					var last_obj = obj;
+					obj.innerText = text[0]
+					for(var i = 1; i < text.length; i++) {
+						if(text[i] || i == text.length - 1)
+							last_obj = this.addEditorBlock(last_obj, text[i])
+					}
+				} else if(this.globalTools && obj.textContent) {
+					console.log("yes")
+					this.hideGlobalTools()
+				} else if(!this.globalTools && !obj.textContent) {
+					this.showGlobalTools(obj)
+				}
+			},
+
+			addEditorBlock(obj, text='') {
 				var element = document.createElement('div')
 				element.classList.add('text-editor__edit-block')
 				element.setAttribute('contenteditable', '')
-				element.innerHTML = html
+				element.innerText = text
 				obj.after(element)
-				obj.nextElementSibling.focus()
-				return obj.nextElementSibling
+				element.focus()
+				return element
 			},
 
-			removeEditorBlock(obj, back=false, del=false) {
+			removeEditorBlock(obj, focusNext=false) {
 				if(!obj.textContent && obj.classList.value != 'text-editor__edit-block') {
 					obj.classList.value = 'text-editor__edit-block'
 					obj.innerHTML = ''
 					obj.focus()
-					this.showTools(obj)
-				} else if(!obj.textContent && obj.parentElement.childElementCount > 1) {
-					var range = document.createRange()
-					if(back && obj.previousElementSibling) {
+					this.showGlobalTools(obj)
+				}
+				if(obj.textContent) return
+				if(!obj.nextElementSibling && focusNext) return
+				if(!obj.previousElementSibling && !focusNext) return
+
+				var range = document.createRange()
+
+				if(focusNext) {
+					if(obj.nextElementSibling.textContent)
+						obj.nextElementSibling.innerHTML = `.${obj.nextElementSibling.innerHTML}`
+					range.selectNodeContents(obj.nextElementSibling)
+					range.collapse(true)
+				} else {
+					if(obj.previousElementSibling.textContent)
 						obj.previousElementSibling.innerHTML += '.'
-						range.selectNodeContents(obj.previousElementSibling)
-						range.collapse()
-					} else if(del && obj.nextElementSibling) {
-						obj.nextElementSibling.innerHTML = '.' + obj.nextElementSibling.innerHTML
-						range.selectNodeContents(obj.nextElementSibling)
-						range.collapse(true)
-					} else return
-					obj.remove()
-					window.getSelection().removeAllRanges()
-					window.getSelection().addRange(range)
+					range.selectNodeContents(obj.previousElementSibling)
+					range.collapse(false)
 				}
+				
+				obj.remove()
+				window.getSelection().removeAllRanges()
+				window.getSelection().addRange(range)
 			},
 
-			clearAll: () => {
-				var blocks = document.querySelectorAll('.text-editor__edit-block')
-				blocks[0].innerHTML = ''
-				blocks[0].classList.value = 'text-editor__edit-block'
-				for(var i = 1; i < blocks.length; i++)
-					blocks[i].remove()
-			},
+			showGlobalTools(obj) {
+				if(obj.textContent || obj.classList.value != 'text-editor__edit-block') return
 
-			getContent: () => {
-				var content = ''
-				var blocks = document.querySelectorAll('.text-editor__edit-block')
-				for(var i = 0; i < blocks.length; i++)
-					if(blocks[i].textContent.trim()) {
-						if(blocks[i].classList.contains('text-editor__header')) {
-							content += `<div class="header">${blocks[i].textContent}</div>`
-						} else if(blocks[i].classList.contains('text-editor__code')) {
-							content += `<div class="code">${blocks[i].innerHTML}</div>`
-						} else if(blocks[i].classList.contains('text-editor__list')) {
-							content += '<div class="list"><ul>'
-							for(var j = 0; j < blocks[i].querySelectorAll('ul > li').length; j++) {
-								if(blocks[i].querySelectorAll('ul > li')[j].textContent)
-									content += `<li>${blocks[i].querySelectorAll('ul > li')[j].textContent}</li>`
-							}
-							content += '</ul></div>'
-						} else {
-							content += `<div>${blocks[i].textContent}</div>`
-						}
-					}
-				return content
-			},
-
-			showTools(obj) {
 				this.focusBlock = obj
+				console.log('Set focus block')
 
-				if(!obj.textContent && obj.classList.value == 'text-editor__edit-block') {
-					this.toolsView = true
-					this.$refs.htmlTools.style.display = 'block'
-					this.$refs.htmlTools.style.top = `${obj.offsetTop}px`
-					this.$refs.htmlTools.style.left = `${obj.offsetLeft + 10}px`
-				}
+				this.globalTools = true
+				this.$refs.globalTools.style.top = `${obj.offsetTop}px`
+				this.$refs.globalTools.style.left = `${obj.offsetLeft + 10}px`
 			},
 
-			hideTools() {
-				if(!this.htmlToolsbarHover) {
+			hideGlobalTools() {
+				if(this.canHideGlobalTools) {
 					this.focusBlock = null
-					this.toolsView = false
-					this.$refs.htmlTools.style.display = 'none'
+					console.log('Remove focus block')
+
+					this.globalTools = false
 				}
 			},
 
-			htmlToolsAdd(obj) {
-				if(obj.tagName == 'path')
-					obj = obj.parentElement
+			unhoverGlobalTools() {
+				this.canHideGlobalTools = true
+				var elements = document.querySelectorAll('.text-editor__global-tools .text-editor__toolsbar-fields')
+				elements == 1
+				setTimeout(() => {
+					for(var i = 0; i < elements.length; i++) {
+						elements[i].style.display = 'none'
+						elements[i].parentElement.parentElement.style.overflow = 'hidden'
+					}
+				}, 300)
+			},
+
+			updateHtml(obj) {
+				if(obj.tagName == 'path') obj = obj.parentElement
+				if(obj.tagName != 'svg') return
+
+				if(obj.hasAttribute('data-hasfields')) {
+					obj.nextElementSibling.style.display = 'flex'
+					obj.parentElement.parentElement.style.overflow = 'visible'
+					return
+				}
 
 				var html = ''
-				var cls = ''
-
-				switch(obj.id) {
-					case 'header-tools':
-						cls = 'header'
-						break
-					case 'code-tools':
-						cls = 'code'
-						break
-					case 'list-tools':
-						cls = 'list'
-						html = '<ul><li></li></ul>'
-						break
-				}
+				var cls = obj.getAttribute('data-tool')
 
 				this.focusBlock.innerHTML = html
 				this.focusBlock.classList.add(`text-editor__${cls}`)
-
-				var range = document.createRange()
-				range.selectNodeContents(this.focusBlock)
-				range.collapse()
-				window.getSelection().removeAllRanges()
-				window.getSelection().addRange(range)
-
-				this.htmlToolsbarHover = false
-				this.hideTools()
-			},
-
-			showTransformToolsbar(event) {
-				console.log(event)
+				this.focusBlock.focus()
+				this.canHideGlobalTools = true
+				this.hideGlobalTools()
+				console.log('update end')
 			}
 		}
 	}
@@ -187,33 +180,35 @@
 <style>
 	.text-editor {
 		position: relative;
-		font-size: 16px;
 	}
 
-	.text-editor__edit-block:focus {
+	.text-editor__edit-block {
 		outline: none;
 	}
 
 	.text-editor__tools {
-		display: none;
 		position: absolute;
-		left: 0;
 		top: 0;
+		left: 0;
 		font-size: 15px;
 	}
 
-	.text-editor__tools-icon:hover + .text-editor__toolsbar,
+	.text-editor__global-tools {
+
+	}
+
+	.text-editor__show-toolsbar-icon:hover + .text-editor__toolsbar,
 	.text-editor__toolsbar:hover {
 		opacity: 1;
 		max-height: 50px;
 	}
 
 	.text-editor__toolsbar {
-		list-style: none;
 		display: flex;
 		position: absolute;
-		margin: 0;
+		list-style: none;
 		padding: 0;
+		margin: 0;
 		opacity: 0;
 		max-height: 0;
 		overflow: hidden;
@@ -221,10 +216,23 @@
 	}
 
 	.text-editor__toolsbar > li {
-		display: flex;
-		align-items: center;
+		border-top: 1px solid #8e44ad;
+		border-bottom: 1px solid #8e44ad;
 		background: #9b59b6;
 		color: #fff;
+		transition: .2s;
+	}
+
+	.text-editor__toolsbar > li:first-child {
+		border-left: 1px solid #8e44ad;
+		border-top-left-radius: 5px;
+		border-bottom-left-radius: 5px;
+	}
+
+	.text-editor__toolsbar > li:last-child {
+		border-right: 1px solid #8e44ad;
+		border-top-right-radius: 5px;
+		border-bottom-right-radius: 5px;
 	}
 
 	.text-editor__toolsbar > li:hover {
@@ -232,20 +240,34 @@
 		cursor: pointer;
 	}
 
-	.text-editor__toolsbar > li:first-child {
-		border-top-left-radius: 5px;
-		border-bottom-left-radius: 5px;
-	}
-
-	.text-editor__toolsbar > li:last-child {
-		border-top-right-radius: 5px;
-		border-bottom-right-radius: 5px;
-	}
-
 	.text-editor__toolsbar-icon {
 		display: block;
-		padding: 7px 10px;
+		padding: 6px 9px;
+	}
+
+	.text-editor__toolsbar-fields {
+		display: none;
+		top: 0;
+		left: 0;
+		min-width: 100%;
+		height: 100%;
+		opacity: 1;
+		max-height: 50px;
+	}
+
+	.text-editor__toolsbar-input {
+		padding: 0 5px;
+		height: 100%;
+		border: none;
+		background: none;
+		font-family: 'Montserrat', sans-serif;
 		font-size: 15px;
+		color: #fff;
+		outline: none;
+	}
+
+	.text-editor__toolsbar-input::placeholder {
+		color: #ddd;
 	}
 
 
